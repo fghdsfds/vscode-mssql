@@ -539,4 +539,26 @@ export enum GridContextMenuAction {
     CopyAsJson = "copy-as-json",
     CopyAsInClause = "copy-as-in-clause",
     CopyAsInsertInto = "copy-as-insert-into",
+    CopyForeignKey = "copy-foreign-key",
 }
+
+export interface CopyForeignKeyParams {
+    uri: string;
+    batchId: number;
+    resultId: number;
+    selection: ISlickRange[];
+    columnName: string;
+}
+
+export namespace CopyForeignKeyRequest {
+    export const type = new RequestType<CopyForeignKeyParams, void, void>("copyForeignKey");
+}
+
+export interface ShowWarningParams {
+    message: string;
+}
+
+export namespace ShowWarningRequest {
+    export const type = new RequestType<ShowWarningParams, void, void>("showWarning");
+}
+

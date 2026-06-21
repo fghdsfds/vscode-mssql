@@ -22,6 +22,7 @@ import store, { QueryResultSingletonStore } from "./singletonStore";
 import * as LocalizedConstants from "../constants/locConstants";
 import { formatXml } from "../utils/utils";
 import { getLogger } from "../models/logger";
+import { virtualFKMap } from "../models/virtualFKMap";
 
 export const MAX_VIEW_COLUMN = 9;
 const logger = getLogger("QueryResult");
@@ -207,6 +208,85 @@ export function registerCommonRequestHandlers(
 
     webviewController.onRequest(qr.CopyColumnNameRequest.type, async (message) => {
         await webviewViewController.getVsCodeWrapper().clipboardWriteText(message.columnName);
+    });
+
+    webviewController.onRequest(qr.ShowWarningRequest.type, async (message) => {
+        await webviewViewController.getVsCodeWrapper().showWarningMessage(message.message);
+    });
+
+    webviewController.onRequest(qr.CopyForeignKeyRequest.type, async (message) => {
+        const sqlOutputProvider = webviewViewController.getSqlOutputContentProvider();
+        const queryRunner = sqlOutputProvider.getQueryRunner(message.uri);
+        if (!queryRunner) {
+            return;
+        }
+
+        const colName = message.columnName;
+        const mapping = virtualFKMap[colName];
+        if (!mapping) {
+            await webviewViewController.getVsCodeWrapper().showWarningMessage(`No Virtual Foreign Key mapping found for column '${colName}'.`);
+            return;
+        }
+
+        if (!message.selection || message.selection.length === 0) {
+            return;
+        }
+
+        const rowIndices = new Set<number>();
+        for (const range of message.selection) {
+            for (let r = range.fromRow; r <= range.toRow; r++) {
+                rowIndices.add(r);
+            }
+        }
+
+        if (rowIndices.size === 0) {
+            return;
+        }
+
+        const minRow = Math.min(...rowIndices);
+        const maxRow = Math.max(...rowIndices);
+        const numRows = maxRow - minRow + 1;
+
+        try {
+            const result = await queryRunner.getRows(minRow, numRows, message.batchId, message.resultId);
+            const rows = result.resultSubset?.rows;
+            if (!rows || rows.length === 0) {
+                return;
+            }
+
+            const colIndex = message.selection[0].fromCell;
+            const cellValues: string[] = [];
+            for (const r of rowIndices) {
+                const relativeIndex = r - minRow;
+                if (rows[relativeIndex] && rows[relativeIndex][colIndex]) {
+                    cellValues.push(rows[relativeIndex][colIndex].displayValue);
+                }
+            }
+
+            const uniqueValues = Array.from(new Set(cellValues))
+                .filter(val => val !== undefined && val !== null && val !== "" && val.toUpperCase() !== "NULL");
+
+            if (uniqueValues.length === 0) {
+                await webviewViewController.getVsCodeWrapper().showWarningMessage("No valid non-NULL values selected for Copy Foreign Key.");
+                return;
+            }
+
+            let sql = "";
+            const { targetTable, targetColumn, isQuoteRequired } = mapping;
+
+            if (uniqueValues.length === 1) {
+                const val = uniqueValues[0];
+                const formattedVal = isQuoteRequired ? `'${val}'` : val;
+                sql = `SELECT * FROM [${targetTable}] WHERE [${targetColumn}] = ${formattedVal};`;
+            } else {
+                const formattedVals = uniqueValues.map(val => isQuoteRequired ? `'${val}'` : val).join(", ");
+                sql = `SELECT * FROM [${targetTable}] WHERE [${targetColumn}] IN (${formattedVals});`;
+            }
+
+            await webviewViewController.getVsCodeWrapper().clipboardWriteText(sql);
+        } catch (err) {
+            await webviewViewController.getVsCodeWrapper().showErrorMessage(`Failed to copy foreign key: ${err?.message || err}`);
+        }
     });
 
     // Register request handlers for query result filters

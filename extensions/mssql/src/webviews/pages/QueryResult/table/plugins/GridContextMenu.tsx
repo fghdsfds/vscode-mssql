@@ -80,6 +80,11 @@ export const GridContextMenu: React.FC<GridContextMenuProps> = ({
                         </MenuItem>
                         <MenuItem
                             className={styles.menuItem}
+                            onClick={() => onAction(GridContextMenuAction.CopyForeignKey)}>
+                            {locConstants.queryResult.copyForeignKey}
+                        </MenuItem>
+                        <MenuItem
+                            className={styles.menuItem}
                             secondaryContent={
                                 keyBindings[WebviewAction.ResultGridCopyWithHeaders].label
                             }

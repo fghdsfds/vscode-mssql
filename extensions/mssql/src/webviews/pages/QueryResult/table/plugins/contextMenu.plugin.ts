@@ -10,6 +10,8 @@ import {
     CopyAsInsertIntoRequest,
     CopyHeadersRequest,
     CopySelectionRequest,
+    CopyForeignKeyRequest,
+    ShowWarningRequest,
     GridContextMenuAction,
     ResultSetSummary,
 } from "../../../../../sharedInterfaces/queryResult";
@@ -168,6 +170,41 @@ export class ContextMenu<T extends Slick.SlickData> {
                         selection: convertedSelection,
                     },
                 );
+                this.queryResultContext.showCopyIndicator();
+                break;
+            case GridContextMenuAction.CopyForeignKey:
+                log.trace("Copy Foreign Key action triggered");
+                if (convertedSelection.length === 0) {
+                    break;
+                }
+                let colIndex: number | undefined = undefined;
+                let isSingleCol = true;
+                for (const range of convertedSelection) {
+                    if (range.fromCell !== range.toCell) {
+                        isSingleCol = false;
+                        break;
+                    }
+                    if (colIndex === undefined) {
+                        colIndex = range.fromCell;
+                    } else if (colIndex !== range.fromCell) {
+                        isSingleCol = false;
+                        break;
+                    }
+                }
+                if (!isSingleCol || colIndex === undefined) {
+                    await this.queryResultContext.extensionRpc.sendRequest(ShowWarningRequest.type, {
+                        message: "Copy Foreign Key can only be used on a single column selection."
+                    });
+                    break;
+                }
+                const columnName = this.resultSetSummary.columnInfo[colIndex].columnName;
+                await this.queryResultContext.extensionRpc.sendRequest(CopyForeignKeyRequest.type, {
+                    uri: this.uri,
+                    batchId: this.resultSetSummary.batchId,
+                    resultId: this.resultSetSummary.id,
+                    selection: convertedSelection,
+                    columnName: columnName
+                });
                 this.queryResultContext.showCopyIndicator();
                 break;
             default:
