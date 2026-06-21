@@ -1691,6 +1691,9 @@
     <trans-unit id="++CODE++96060c7cd5841d631c4c2cf65834a41409b3005fd80c393f48e902ade8901239">
       <source xml:lang="en">Copy Column Name</source>
     </trans-unit>
+    <trans-unit id="++CODE++2dfa411d63a82780e648b766aad3470faa71ae4e61f1d02cf61ffdace2020aee">
+      <source xml:lang="en">Copy Foreign Key</source>
+    </trans-unit>
     <trans-unit id="++CODE++e172d8c5fbb864a5f85d4926588ef06167cdd4a29ddffdf07714bf25336c2269">
       <source xml:lang="en">Copy Headers</source>
     </trans-unit>

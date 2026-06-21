@@ -2770,6 +2770,7 @@
     },
     "Query Plan": "Query Plan",
     "Select All": "Select All",
+    "Copy Foreign Key": "Copy Foreign Key",
     "Copy Headers": "Copy Headers",
     "Error: Unrecognized query result data.": "Error: Unrecognized query result data.",
     "Export toolbar for result set {0}/{0} is the result set number (1-based index)": {

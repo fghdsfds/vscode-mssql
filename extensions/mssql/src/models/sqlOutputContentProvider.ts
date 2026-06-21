@@ -313,10 +313,6 @@ export class SqlOutputContentProvider {
             : this._queryResultsMap.get(uri).queryRunner.isExecutingQuery;
     }
 
-    public getQueryRunner(uri: string): QueryRunner | undefined {
-        return this._queryResultsMap.get(uri)?.queryRunner;
-    }
-
     /**
      * Runs a query against the database.
      * @param statusView The status view to use for showing query progress

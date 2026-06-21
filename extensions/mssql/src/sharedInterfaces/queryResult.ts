@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------------------------
+6; /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
@@ -561,4 +561,3 @@ export interface ShowWarningParams {
 export namespace ShowWarningRequest {
     export const type = new RequestType<ShowWarningParams, void, void>("showWarning");
 }
-
