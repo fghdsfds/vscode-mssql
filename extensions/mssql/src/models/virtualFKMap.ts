@@ -24,7 +24,7 @@ const dummyFKMap: Record<string, ForeignKeyMapping> = {
     CustomerID: {
         targetTable: "tblCustomer",
         targetColumn: "CustomerID",
-        isQuoteRequired: true,
+        isQuoteRequired: false,
     },
 };
 
