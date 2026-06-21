@@ -1,9 +1,9 @@
 {
     "name": "mssql",
-    "displayName": "SQL Server (mssql) FK",
-    "version": "1.44.0",
+    "displayName": "SQL Server (mssql)",
+    "version": "69.69.0",
     "description": "Design and optimize schemas for SQL Server, Azure SQL, and SQL Database in Fabric using a modern, lightweight extension built for developers",
-    "publisher": "kristian-mssql",
+    "publisher": "ms-mssql",
     "preview": false,
     "license": "SEE LICENSE IN LICENSE.txt",
     "aiKey": "29a207bb14f84905966a8f22524cb730-25407f35-11b6-4d4e-8114-ab9e843cb52f-7380",
