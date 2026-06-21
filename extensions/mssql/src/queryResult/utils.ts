@@ -224,7 +224,11 @@ export function registerCommonRequestHandlers(
         const colName = message.columnName;
         const mapping = virtualFKMap[colName];
         if (!mapping) {
-            await webviewViewController.getVsCodeWrapper().showWarningMessage(`No Virtual Foreign Key mapping found for column '${colName}'.`);
+            await webviewViewController
+                .getVsCodeWrapper()
+                .showWarningMessage(
+                    `No Virtual Foreign Key mapping found for column '${colName}'.`,
+                );
             return;
         }
 
@@ -248,7 +252,12 @@ export function registerCommonRequestHandlers(
         const numRows = maxRow - minRow + 1;
 
         try {
-            const result = await queryRunner.getRows(minRow, numRows, message.batchId, message.resultId);
+            const result = await queryRunner.getRows(
+                minRow,
+                numRows,
+                message.batchId,
+                message.resultId,
+            );
             const rows = result.resultSubset?.rows;
             if (!rows || rows.length === 0) {
                 return;
@@ -263,11 +272,15 @@ export function registerCommonRequestHandlers(
                 }
             }
 
-            const uniqueValues = Array.from(new Set(cellValues))
-                .filter(val => val !== undefined && val !== null && val !== "" && val.toUpperCase() !== "NULL");
+            const uniqueValues = Array.from(new Set(cellValues)).filter(
+                (val) =>
+                    val !== undefined && val !== null && val !== "" && val.toUpperCase() !== "NULL",
+            );
 
             if (uniqueValues.length === 0) {
-                await webviewViewController.getVsCodeWrapper().showWarningMessage("No valid non-NULL values selected for Copy Foreign Key.");
+                await webviewViewController
+                    .getVsCodeWrapper()
+                    .showWarningMessage("No valid non-NULL values selected for Copy Foreign Key.");
                 return;
             }
 
@@ -277,15 +290,19 @@ export function registerCommonRequestHandlers(
             if (uniqueValues.length === 1) {
                 const val = uniqueValues[0];
                 const formattedVal = isQuoteRequired ? `'${val}'` : val;
-                sql = `SELECT * FROM [${targetTable}] WHERE [${targetColumn}] = ${formattedVal};`;
+                sql = `SELECT * FROM ${targetTable} WHERE ${targetColumn} = ${formattedVal};`;
             } else {
-                const formattedVals = uniqueValues.map(val => isQuoteRequired ? `'${val}'` : val).join(", ");
-                sql = `SELECT * FROM [${targetTable}] WHERE [${targetColumn}] IN (${formattedVals});`;
+                const formattedVals = uniqueValues
+                    .map((val) => (isQuoteRequired ? `'${val}'` : val))
+                    .join(", ");
+                sql = `SELECT * FROM ${targetTable} WHERE ${targetColumn} IN (${formattedVals});`;
             }
 
             await webviewViewController.getVsCodeWrapper().clipboardWriteText(sql);
         } catch (err) {
-            await webviewViewController.getVsCodeWrapper().showErrorMessage(`Failed to copy foreign key: ${err?.message || err}`);
+            await webviewViewController
+                .getVsCodeWrapper()
+                .showErrorMessage(`Failed to copy foreign key: ${err?.message || err}`);
         }
     });
 
