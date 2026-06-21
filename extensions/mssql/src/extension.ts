@@ -29,6 +29,7 @@ import {
     initializeUriOwnershipCoordinator,
 } from "./uriOwnership/uriOwnershipInitialization";
 import { registerSqlToolsMcpServer } from "./sqlToolsMcp/registerSqlToolsMcpServer";
+import { initializeFKMap } from "./models/virtualFKMap";
 
 /** exported for testing purposes only */
 export let controller: MainController = undefined;
@@ -43,6 +44,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IExten
     context.subscriptions.push(controller);
     // Initialize loc cache for webviews early so that it's ready by the time any webview requests it.
     initializeWebviewLocalizationCache();
+    await initializeFKMap(context);
 
     IconUtils.initialize(context.extensionUri);
 

@@ -22,7 +22,7 @@ import store, { QueryResultSingletonStore } from "./singletonStore";
 import * as LocalizedConstants from "../constants/locConstants";
 import { formatXml } from "../utils/utils";
 import { getLogger } from "../models/logger";
-import { virtualFKMap } from "../models/virtualFKMap";
+import { cachedFKMap } from "../models/virtualFKMap";
 
 export const MAX_VIEW_COLUMN = 9;
 const logger = getLogger("QueryResult");
@@ -222,7 +222,7 @@ export function registerCommonRequestHandlers(
         }
 
         const colName = message.columnName;
-        const mapping = virtualFKMap[colName];
+        const mapping = cachedFKMap[colName];
         if (!mapping) {
             await webviewViewController
                 .getVsCodeWrapper()
